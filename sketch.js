@@ -5,6 +5,10 @@ function setup(){
     
     let canvas = document.getElementById('defaultCanvas0'); //Capturing p5js canvas from the document
     canvas.style.display = 'block'; //To avoid displaying scroll bars
+
+    let func = new CosFunc(1);
+
+    console.log(func.derAt(Math.PI / 2));
 }
 
 function draw(){
