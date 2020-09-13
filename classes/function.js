@@ -9,6 +9,8 @@ class Func {
     der() { }
 
     copy() { }
+
+    label(param){}
 }
 
 class SumFunc extends Func {
@@ -265,6 +267,10 @@ class SinFunc extends Func {
     copy() {
         return new SinFunc(this.a);
     }
+
+    label(param){
+        return this.a + "sen(" + param + ")";
+    }
 }
 
 class CosFunc extends Func {
@@ -304,7 +310,7 @@ class LinFunc extends Func {
 
     //f(x) = ax + b
     valAt(x) {
-        return this.a * x + b;
+        return this.a * x + this.b;
     }
 
     //f(x) = a
@@ -320,11 +326,16 @@ class LinFunc extends Func {
     copy() {
         return new LinFunc(this.a, this.b);
     }
+
+    label(param){
+        return this.a + param + " + " + this.b;
+    }
 }
 
 class QuadFunc extends Func {
     //f(x) = ax^2 + bx + c
     constructor(a, b, c) {
+        super();
         this.a = a;
         this.b = b;
         this.c = c;
@@ -332,7 +343,7 @@ class QuadFunc extends Func {
 
     //f(x) = ax^2 + bx + c
     valAt(x) {
-        return this.a * Math.pow(x, 2) + this.b * x, + this.c;
+        return this.a * Math.pow(x, 2) + this.b * x + this.c;
     }
 
     //f(x) = 2ax + b
@@ -346,6 +357,6 @@ class QuadFunc extends Func {
     }
 
     copy() {
-        return new QuadFuncu(this.a, this.b, this.c);
+        return new QuadFunc(this.a, this.b, this.c);
     }
 }
