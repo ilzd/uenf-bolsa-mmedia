@@ -45,6 +45,10 @@ class SumFunc extends Func {
             this.h.copy()
         );
     }
+
+    label(param){
+        return "(" + this.g.label(param) + ") + (" + this.h.label(param) + ")";
+    }
 }
 
 class SubFunc extends Func {
@@ -78,6 +82,10 @@ class SubFunc extends Func {
             this.g.copy(),
             this.h.copy()
         );
+    }
+
+    label(param){
+        return "(" + this.g.label(param) + ") - (" + this.h.label(param) + ")";
     }
 }
 
@@ -118,6 +126,10 @@ class ProdFunc extends Func {
             this.fun1.copy(),
             this.fun2.copy()
         );
+    }
+
+    label(param){
+        return "(" + this.g.label(param) + ") * (" + this.h.label(param) + ")";
     }
 }
 
@@ -165,6 +177,10 @@ class QuocFunc extends Func {
             this.h.copy()
         );
     }
+
+    label(param){
+        return "(" + this.g.label(param) + ") / (" + this.h.label(param) + ")";
+    }
 }
 
 class ConsFunc extends Func {
@@ -191,6 +207,10 @@ class ConsFunc extends Func {
 
     copy() {
         return new ConsFunc(this.c);
+    }
+
+    label(param){
+        return "" + this.c;;
     }
 }
 
@@ -240,6 +260,22 @@ class PolyFunc extends Func {
 
         return new PolyFunc(cParams);
     }
+
+    label(param){
+        let lab = "", check = false;
+
+        for(let i = 0; i < this.params.length; i++){
+            if(this.params[i][0] != 0){
+                if(check) lab += " + ";
+
+                lab += (this.params[i][0] != 1) ? "" + this.params[i][0] + param : param;
+                lab += "^" + this.params[i][1];
+                check = true;
+            }
+        }
+
+        return lab;
+    }
 }
 
 class SinFunc extends Func {
@@ -269,7 +305,7 @@ class SinFunc extends Func {
     }
 
     label(param){
-        return this.a + "sen(" + param + ")";
+        return "" + this.a + "sen(" + param + ")";;
     }
 }
 
@@ -297,6 +333,10 @@ class CosFunc extends Func {
 
     copy() {
         return new CosFunc(this.a);
+    }
+
+    label(param){
+        return "" + this.a + "cos(" + param + ")";
     }
 }
 
@@ -328,7 +368,18 @@ class LinFunc extends Func {
     }
 
     label(param){
-        return this.a + param + " + " + this.b;
+        let lab = "", check = false;
+        if(this.a != 0) {
+            lab += (this.a != 1) ? this.a : "";
+            lab += param;
+            check = true;
+        }
+        if(this.b != 0) {
+            if(check) lab += " + ";
+            lab += this.b;
+        }
+
+        return lab;
     }
 }
 
@@ -358,5 +409,26 @@ class QuadFunc extends Func {
 
     copy() {
         return new QuadFunc(this.a, this.b, this.c);
+    }
+
+    label(param){
+        let lab = "", check = false;
+        if(this.a != 0) {
+            lab += (this.a != 1) ? this.a : "";
+            lab += param + "^2";
+            check = true;
+        }
+        if(this.b != 0) {
+            if(check) lab += " + ";
+            lab += (this.b != 1) ? this.b : "";
+            lab += param;
+            check = true;
+        }
+        if(this.c != 0) {
+            if(check) lab += " + ";
+            lab += this.c;
+        }
+
+        return lab;
     }
 }

@@ -18,7 +18,9 @@ function draw() {
 }
 
 function mousePressed(){
+    act.onMousePressed(mouseButton, mouseX, mouseY);
 }
 
 function keyPressed(){
+    act.onKeyPressed(key);
 }

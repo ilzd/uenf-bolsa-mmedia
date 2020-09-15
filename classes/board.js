@@ -5,6 +5,7 @@ class Board {
         this.py = py;
         this.w = w;
         this.h = h;
+        this.graphics = createGraphics(w, h);
         this.showFunction = true;
         this.showAxis = true;
         this.showRanges = true;
@@ -12,20 +13,19 @@ class Board {
         this.showMarkedLines = true;
         this.rangeX = [-2 * Math.PI, 2 * Math.PI];
         this.rangeY = [-60, 60];
-        this.bgColor = color(0, 0, 0);
+        this.bgColor = color(0, 10, 0);
         this.markedPoints = [];
         this.markedXLines = [];
         this.markedYLines = [];
     }
 
-    display(gr) {
-        gr.push();
-        gr.translate(this.px, this.py);
+    display() {
+        let gr = this.graphics;
+        gr.background(0);
 
         gr.fill(this.bgColor);
-        gr.stroke(255);
-        gr.strokeWeight(1);
-        gr.rect(0, 0, this.w, this.h);
+        gr.noStroke();
+        gr.rect(1, 1, this.w - 2, this.h - 2);
 
         if (this.showAxis) this.drawAxis(gr);
 
@@ -37,10 +37,14 @@ class Board {
 
         if (this.showRanges) this.drawRanges(gr);
 
-        gr.pop();
+        gr.noFill();
+        gr.stroke(255);
+        gr.strokeWeight(.5);
+        gr.rect(1, 1, this.w - 2, this.h - 2);
     }
 
-    drawMarkedLines(gr){
+    drawMarkedLines(){
+        let gr = this.graphics;
         gr.push();
         gr.translate(this.w / 2, this.h / 2);
 
@@ -48,7 +52,7 @@ class Board {
         gr.scale(1, -1);
 
         let fx, fy;
-        gr.strokeWeight(2);
+        gr.strokeWeight(1.5);
         gr.stroke(80, 120, 30);
         for (let i = 0; i <= this.markedXLines.length; i++) {
             fx = map(this.markedXLines[i], this.rangeX[0], this.rangeX[1], -this.w / 2, this.w / 2);
@@ -81,24 +85,26 @@ class Board {
 
     }
 
-    drawMarkedPoints(gr){
+    drawMarkedPoints(){
+        let gr = this.graphics;
         gr.push();
         gr.translate(this.w / 2, this.h / 2);
         gr.scale(1, -1);
 
-        gr.strokeWeight(6);
+        gr.strokeWeight(8);
         gr.stroke(255, 0, 0);
         let fx, fy;
-        for (let i = 0; i <= this.markedPoints.length; i++) {
-            fx = map(this.markedPoints[i], this.rangeX[0], this.rangeX[1], -this.w / 2, this.w / 2);
-            fy = map(this.fun.valAt(this.markedPoints[i]), this.rangeY[0], this.rangeY[1], -this.h / 2, this.h / 2);
+        for (let i = 0; i < this.markedPoints.length; i++) {
+            fx = map(this.markedPoints[i][0], this.rangeX[0], this.rangeX[1], -this.w / 2, this.w / 2);
+            fy = map(this.markedPoints[i][1], this.rangeY[0], this.rangeY[1], -this.h / 2, this.h / 2);
             gr.point(fx, fy);
         }
 
         gr.pop();
     }
 
-    drawAxis(gr) {
+    drawAxis() {
+        let gr = this.graphics;
         gr.stroke(255);
         gr.strokeWeight(1);
 
@@ -106,7 +112,8 @@ class Board {
         gr.line(this.w / 2, 0, this.w / 2, this.h);
     }
 
-    drawRanges(gr) {
+    drawRanges() {
+        let gr = this.graphics;
         gr.noStroke();
         gr.fill(255);
         gr.textSize(14);
@@ -124,7 +131,8 @@ class Board {
         gr.text("" + Math.round(this.rangeY[0]), this.w / 2 + 10, this.h - 3);
     }
 
-    drawFunction(gr) {
+    drawFunction() {
+        let gr = this.graphics;
         gr.push();
         gr.translate(this.w / 2, this.h / 2);
         gr.scale(1, -1);
@@ -145,7 +153,8 @@ class Board {
         gr.pop();
     }
 
-    drawPoint(gr, x) {
+    drawPoint(x) {
+        let gr = this.graphics;
         gr.push();
         gr.translate(this.w / 2, this.h / 2);
         gr.scale(1, -1);
