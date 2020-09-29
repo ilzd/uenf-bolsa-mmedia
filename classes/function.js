@@ -2,14 +2,20 @@ class Func {
     constructor() {
     }
 
+    //Retorna o valor desta função no ponto x
     valAt(x) { }
 
+    //Retorna a derivada desta função no ponto x
     derAt(x) { }
 
+    //Retorna a função derivada desta função
     der() { }
 
+    //Retorna uma cópia desta função
     copy() { }
 
+    //Retorna o "label" desta função utilizando
+    //"param" como variável independente
     label(param){}
 }
 
@@ -305,7 +311,7 @@ class SinFunc extends Func {
     }
 
     label(param){
-        return "" + this.a + "sen(" + param + ")";;
+        return "" + this.a + "sen(" + param + ")";
     }
 }
 
@@ -355,7 +361,7 @@ class LinFunc extends Func {
 
     //f(x) = a
     derAt(x) {
-        return this.a * x;
+        return this.a;
     }
 
     //f(x) = a

@@ -9,26 +9,154 @@ class Activity {
         this.graphics = createGraphics(w, h);
     }
 
+    //Metodo que atualiza o estado do OA
     update() { }
 
+    //Método que captura os eventos de teclado enviados pelo P5.js
     onKeyPressed(key) { }
 
+    //Método que captura os eventos de mouse enviados pelo P5.js
     onMousePressed(button, mx, my) { }
 }
 
-class SimpleGraph extends Activity {
+class MenuActivity extends Activity {
     constructor(px, py, w, h) {
         super(px, py, w, h);
-        this.board = new Board(new SinFunc(50), 0, 0, w, h);
+        this.options = [
+            {
+                pos: [w / 2, 300],
+                title: "Curvas de funções",
+                act: new SimpleGraphDisplay(px, py, w, h),
+            },
+            {
+                pos: [w / 2, 340],
+                title: "Formação da curva de funções",
+                act: new FunctionCurveForming(px, py, w, h),
+            },
+            {
+                pos: [w / 2, 380],
+                title: "Função seno pelo círculo trigonométrico",
+                act: new SinForming(px, py, w, h),
+            },
+            {
+                pos: [w / 2, 420],
+                title: "Função cosseno pelo círculo trigonométrico",
+                act: new CosForming(px, py, w, h),
+            },
+            {
+                pos: [w / 2, 460],
+                title: "Reta tangente",
+                act: new TanLine(px, py, w, h),
+            },
+            {
+                pos: [w / 2, 500],
+                title: "Formação da função derivada",
+                act: new DerivativeForming(px, py, w, h),
+            },
+        ]
+    }
+
+    update() {
+        let g = this.graphics;
+
+        g.background(0);
+
+        g.fill(255);
+        g.noStroke();
+        g.textAlign(CENTER, CENTER);
+        g.textSize(38);
+
+        g.text("Objetos de aprendizagem\nCálculo diferencial e integral", this.w / 2, 100);
+
+        g.textSize(28);
+        g.text("Pressione o número da opção desejada:", this.w / 2, 250);
+
+        g.textSize(24);
+        for (let i = 0; i < this.options.length; i++) {
+            let op = this.options[i];
+            g.text((i + 1) + ". " + op.title, op.pos[0], op.pos[1]);
+        }
+
+        image(g, this.px, this.py);
+    }
+
+    onKeyPressed(key) {
+        for (let i = 0; i < this.options.length; i++) {
+            if (key == "" + (i + 1)) {
+                act = this.options[i].act;
+                break;
+            }
+        }
+    }
+
+    onMousePressed(button, mx, my) {
+    }
+}
+
+class SimpleGraphDisplay extends Activity {
+    constructor(px, py, w, h) {
+        super(px, py, w, h);
+
+        this.options = [
+            {
+                fun: new LinFunc(1, 0),
+                rangeX: [-10, 10],
+                rangeY: [-10, 10],
+                label: "x",
+            },
+            {
+                fun: new QuadFunc(1, 0, 0),
+                rangeX: [-5, 5],
+                rangeY: [-10, 10],
+                label: "x²",
+            },
+            {
+                fun: new PolyFunc([[1, 3]]),
+                rangeX: [-3, 3],
+                rangeY: [-10, 10],
+                label: "x³",
+            },
+            {
+                fun: new SinFunc(1),
+                rangeX: [-10, 10],
+                rangeY: [-2, 2],
+                label: "sen(x)",
+            },
+            {
+                fun: new CosFunc(1),
+                rangeX: [-10, 10],
+                rangeY: [-2, 2],
+                label: "cos(x)",
+            },
+        ];
+
+        this.opH = 100;
+
+        let op = this.options[0];
+        this.board = new Board(op.fun, 0, 0, w * 0.9, h);
+        this.board.rangeX = op.rangeX;
+        this.board.rangeY = op.rangeX;
+        this.board.showRanges = false;
     }
 
     update() {
         let g = this.graphics;
         let b = this.board;
 
-        g.background(127, 80, 56);
+        g.background(0);
         b.display();
         g.image(b.graphics, b.px, b.py);
+
+        let opW = this.w * 0.95;
+        g.textSize(24);
+        g.fill(255);
+        g.noStroke();
+        g.textAlign(CENTER, CENTER);
+        for (let i = 0; i < this.options.length; i++) {
+            let op = this.options[i];
+            g.text(op.label, opW, this.opH * i + this.opH / 2);
+        }
+
         image(g, this.px, this.py);
     }
 
@@ -36,17 +164,27 @@ class SimpleGraph extends Activity {
     }
 
     onMousePressed(button, mx, my) {
+        for (let i = 0; i < this.options.length; i++) {
+            if (mx > this.w * 0.9) {
+                if (my < (i + 1) * this.opH) {
+                    this.selectOption(this.options[i]);
+                    break;
+                }
+            }
+        }
+    }
+
+    selectOption(op) {
+        this.board.fun = op.fun;
+        this.board.rangeX = op.rangeX;
+        this.board.rangeY = op.rangeY;
     }
 }
 
-class CurveForming extends Activity {
+class FunctionCurveForming extends Activity {
     constructor(px, py, w, h) {
         super(px, py, w, h);
-        this.fun = new LinFunc(1, 0);
-
-        this.board = new Board(this.fun, w / 4, h / 3, w / 2, h / 1.8);
-        this.board.rangeY = [-6, 6];
-        this.board.showFunction = false;
+        this.fun = new SinFunc(1);
 
         this.labelParam = 'x';
         this.labelY = 'y';
@@ -77,6 +215,47 @@ class CurveForming extends Activity {
 
         this.isFaster = false;
         this.justRestarted = false;
+
+        this.options = [
+            {
+                fun: new LinFunc(1, 0),
+                rangeX: [-10, 10],
+                rangeY: [-10, 10],
+                label: "x",
+            },
+            {
+                fun: new QuadFunc(1, 0, 0),
+                rangeX: [-5, 5],
+                rangeY: [0, 20],
+                label: "x²",
+            },
+            {
+                fun: new PolyFunc([[1, 3]]),
+                rangeX: [-2.3, 2.3],
+                rangeY: [-10, 10],
+                label: "x³",
+            },
+            {
+                fun: new SinFunc(1),
+                rangeX: [-7, 7],
+                rangeY: [-2, 2],
+                label: "sen(x)",
+            },
+            {
+                fun: new CosFunc(1),
+                rangeX: [-7, 7],
+                rangeY: [-2, 2],
+                label: "cos(x)",
+            },
+        ];
+
+        this.opH = 100;
+
+        let op = this.options[0];
+        this.board = new Board(op.fun, 0, 0, w * 0.9, h);
+        this.board.rangeX = op.rangeX;
+        this.board.rangeY = op.rangeX;
+        this.board.showFunction = false;
     }
 
     update() {
@@ -99,7 +278,7 @@ class CurveForming extends Activity {
         } else {
             switch (this.animationStage) {
                 case 0:
-                    if(this.justRestarted){
+                    if (this.justRestarted) {
                         b.markedPoints = [];
                         b.markedXLines = [];
                         b.markedYLines = [];
@@ -210,11 +389,21 @@ class CurveForming extends Activity {
             }
         }
 
+        let opW = this.w * 0.95;
+        g.textSize(24);
+        g.fill(255);
+        g.noStroke();
+        g.textAlign(CENTER, CENTER);
+        for (let i = 0; i < this.options.length; i++) {
+            let op = this.options[i];
+            g.text(op.label, opW, this.opH * i + this.opH / 2);
+        }
+
         image(g, this.px, this.py);
     }
 
     calculateLabel() {
-        this.funcLabelText = "f(" + this.labelParam + ") = " + this.fun.label("(" + this.labelParam + ")") + " = " + this.labelY;
+        this.funcLabelText = "f(" + this.labelParam + ") = " + this.fun.label(this.labelParam) + " = " + this.labelY;
         this.graphics.textSize(this.labelTextSize);
         this.funcLabelWidth = this.graphics.textWidth(this.funcLabelText);
         this.labelXPos = [this.labelPos[0] - this.funcLabelWidth / 2 + 40, this.labelPos[1]];
@@ -226,7 +415,435 @@ class CurveForming extends Activity {
     }
 
     onMousePressed(button, mx, my) {
-
+        for (let i = 0; i < this.options.length; i++) {
+            if (mx > this.w * 0.9) {
+                if (my < (i + 1) * this.opH) {
+                    this.selectOption(this.options[i]);
+                    break;
+                }
+            }
+        }
     }
 
+
+    selectOption(op) {
+        let ac = new FunctionCurveForming(this.px, this.py, this.w, this.h);
+        ac.board.fun = op.fun;
+        ac.fun = op.fun;
+        ac.board.rangeX = op.rangeX;
+        ac.board.rangeY = op.rangeY;
+        ac.calculateLabel();
+        act = ac;
+    }
+
+
+}
+
+class SinForming extends Activity {
+    constructor(px, py, w, h) {
+        super(px, py, w, h);
+        this.sinBoardW = w / 2.1;
+        this.sinBoardH = h / 2.1;
+        this.board = new Board(new SinFunc(1), 3 * (w / 4) - this.sinBoardW / 2, h / 2 - this.sinBoardH / 2, this.sinBoardW, this.sinBoardH);
+        this.board.rangeY = [-1, 1];
+        this.board.rangeX = [0, Math.PI * 4];
+        this.board.showFunction = false;
+        this.xPos = this.board.rangeX[0];
+        this.circlePx = w / 4;
+        this.circlePy = h / 2;
+    }
+
+    update() {
+        let g = this.graphics;
+        let b = this.board;
+
+        g.background(0);
+        b.display();
+        g.image(b.graphics, b.px, b.py);
+
+        g.stroke(127);
+        g.strokeWeight(2);
+        g.noFill();
+        g.ellipse(this.circlePx, this.circlePy, this.sinBoardH, this.sinBoardH);
+        g.line(this.circlePx - this.sinBoardH / 1.7, this.circlePy, this.circlePx + this.sinBoardH / 1.7, this.circlePy);
+        g.line(this.circlePx, this.circlePy - this.sinBoardH / 1.7, this.circlePx, this.circlePy + this.sinBoardH / 1.7);
+
+        g.fill(255);
+        g.textSize(22);
+        g.noStroke();
+        g.textAlign(CENTER, CENTER);
+        g.text("-1", this.circlePx - this.sinBoardH / 1.5 + 10, this.circlePy);
+        g.text("1", this.circlePx + this.sinBoardH / 1.5 - 10, this.circlePy);
+        g.text("-1", this.circlePx, this.circlePy + this.sinBoardH / 1.5 - 10);
+        g.text("1", this.circlePx, this.circlePy - this.sinBoardH / 1.5 + 10);
+        g.textSize(18);
+        g.text("0", this.circlePx + this.sinBoardH / 1.5 - 45, this.circlePy - 10);
+        g.text("π/2", this.circlePx + 20, this.circlePy - this.sinBoardH / 1.5 + 42);
+        g.text("π", this.circlePx - this.sinBoardH / 1.5 + 42, this.circlePy + 13);
+        g.text("3π/2", this.circlePx + 22, this.circlePy + this.sinBoardH / 1.5 - 40);
+        g.text("2π", this.circlePx + this.sinBoardH / 1.5 - 38, this.circlePy + 13);
+
+        g.textSize(22);
+        g.fill(20, 120, 255);
+        g.text(round(this.xPos * 10) / 10, this.circlePx + Math.cos(this.xPos) * this.sinBoardH / 2.4, this.circlePy - Math.sin(this.xPos) * this.sinBoardH / 2.4);
+        g.strokeWeight(15);
+        g.stroke(20, 120, 255);
+        g.point(this.circlePx + Math.cos(this.xPos) * this.sinBoardH / 2, this.circlePy - Math.sin(this.xPos) * this.sinBoardH / 2);
+
+        g.strokeWeight(5);
+        g.stroke(255, 40, 40);
+        g.line(this.circlePx, this.circlePy, this.circlePx, this.circlePy - Math.sin(this.xPos) * this.sinBoardH / 2);
+        g.strokeWeight(15);
+        g.point(this.circlePx, this.circlePy - Math.sin(this.xPos) * this.sinBoardH / 2);
+        g.noStroke();
+        g.fill(255, 40, 40);
+        g.text(Math.round(Math.sin(this.xPos) * 10) / 10, this.circlePx + 30, this.circlePy - Math.sin(this.xPos) * this.sinBoardH / 2);
+
+        let boardPx = b.px + map(this.xPos, b.rangeX[0], b.rangeX[1], 0, b.w);
+        g.strokeWeight(15);
+        g.stroke(20, 120, 255);
+        g.textSize(18);
+        g.fill(20, 120, 255);
+        g.point(boardPx, b.py + b.h / 2);
+        g.noStroke();
+        g.text(round(this.xPos * 10) / 10, boardPx, b.py + b.h / 2 + 20);
+
+        b.markedPoints.push([this.xPos, b.fun.valAt(this.xPos)]);
+
+        this.xPos += 0.01;
+
+        if (this.xPos > b.rangeX[1]) {
+            this.xPos = b.rangeX[0];
+            b.markedPoints = [];
+        }
+
+
+        image(g, this.px, this.py);
+    }
+
+    onKeyPressed(key) { }
+
+    onMousePressed(button, mx, my) { }
+}
+
+class CosForming extends Activity {
+    constructor(px, py, w, h) {
+        super(px, py, w, h);
+        this.sinBoardW = w / 2.1;
+        this.sinBoardH = h / 2.1;
+        this.board = new Board(new CosFunc(1), 3 * (w / 4) - this.sinBoardW / 2, h / 2 - this.sinBoardH / 2, this.sinBoardW, this.sinBoardH);
+        this.board.rangeY = [-1, 1];
+        this.board.rangeX = [0, Math.PI * 4];
+        this.board.showFunction = false;
+        this.xPos = this.board.rangeX[0];
+        this.circlePx = w / 4;
+        this.circlePy = h / 2;
+    }
+
+    update() {
+        let g = this.graphics;
+        let b = this.board;
+
+        g.background(0);
+        b.display();
+        g.image(b.graphics, b.px, b.py);
+
+        g.stroke(127);
+        g.strokeWeight(2);
+        g.noFill();
+        g.ellipse(this.circlePx, this.circlePy, this.sinBoardH, this.sinBoardH);
+        g.line(this.circlePx - this.sinBoardH / 1.7, this.circlePy, this.circlePx + this.sinBoardH / 1.7, this.circlePy);
+        g.line(this.circlePx, this.circlePy - this.sinBoardH / 1.7, this.circlePx, this.circlePy + this.sinBoardH / 1.7);
+
+        g.fill(255);
+        g.textSize(22);
+        g.noStroke();
+        g.textAlign(CENTER, CENTER);
+        g.text("-1", this.circlePx - this.sinBoardH / 1.5 + 10, this.circlePy);
+        g.text("1", this.circlePx + this.sinBoardH / 1.5 - 10, this.circlePy);
+        g.text("-1", this.circlePx, this.circlePy + this.sinBoardH / 1.5 - 10);
+        g.text("1", this.circlePx, this.circlePy - this.sinBoardH / 1.5 + 10);
+        g.textSize(18);
+        g.text("0", this.circlePx + this.sinBoardH / 1.5 - 45, this.circlePy - 10);
+        g.text("π/2", this.circlePx + 20, this.circlePy - this.sinBoardH / 1.5 + 42);
+        g.text("π", this.circlePx - this.sinBoardH / 1.5 + 42, this.circlePy + 13);
+        g.text("3π/2", this.circlePx + 22, this.circlePy + this.sinBoardH / 1.5 - 40);
+        g.text("2π", this.circlePx + this.sinBoardH / 1.5 - 38, this.circlePy + 13);
+
+        g.textSize(22);
+        g.fill(20, 120, 255);
+        g.text(round(this.xPos * 10) / 10, this.circlePx + Math.cos(this.xPos) * this.sinBoardH / 2.4, this.circlePy - Math.sin(this.xPos) * this.sinBoardH / 2.4);
+        g.strokeWeight(15);
+        g.stroke(20, 120, 255);
+        g.point(this.circlePx + Math.cos(this.xPos) * this.sinBoardH / 2, this.circlePy - Math.sin(this.xPos) * this.sinBoardH / 2);
+
+        g.strokeWeight(5);
+        g.stroke(255, 40, 40);
+        g.line(this.circlePx, this.circlePy, this.circlePx + Math.cos(this.xPos) * this.sinBoardH / 2, this.circlePy);
+        g.strokeWeight(15);
+        g.point(this.circlePx + Math.cos(this.xPos) * this.sinBoardH / 2, this.circlePy);
+        g.noStroke();
+        g.fill(255, 40, 40);
+        g.text(Math.round(Math.sin(this.xPos) * 10) / 10, this.circlePx + Math.cos(this.xPos) * this.sinBoardH / 2, this.circlePy - 25);
+
+        let boardPx = b.px + map(this.xPos, b.rangeX[0], b.rangeX[1], 0, b.w);
+        g.strokeWeight(15);
+        g.stroke(20, 120, 255);
+        g.textSize(18);
+        g.fill(20, 120, 255);
+        g.point(boardPx, b.py + b.h / 2);
+        g.noStroke();
+        g.text(round(this.xPos * 10) / 10, boardPx, b.py + b.h / 2 + 20);
+
+        b.markedPoints.push([this.xPos, b.fun.valAt(this.xPos)]);
+
+        this.xPos += 0.01;
+
+        if (this.xPos > b.rangeX[1]) {
+            this.xPos = b.rangeX[0];
+            b.markedPoints = [];
+        }
+
+
+        image(g, this.px, this.py);
+    }
+
+    onKeyPressed(key) { }
+
+    onMousePressed(button, mx, my) { }
+}
+
+class TanLine extends Activity {
+    constructor(px, py, w, h) {
+        super(px, py, w, h);
+
+        this.options = [
+            {
+                fun: new LinFunc(1, 0),
+                rangeX: [-10, 10],
+                rangeY: [-10, 10],
+                label: "x",
+            },
+            {
+                fun: new QuadFunc(1, 0, 0),
+                rangeX: [-3.5, 3.5],
+                rangeY: [-0.5, 10],
+                label: "x²",
+            },
+            {
+                fun: new PolyFunc([[1, 3]]),
+                rangeX: [-3, 3],
+                rangeY: [-10, 10],
+                label: "x³",
+            },
+            {
+                fun: new SinFunc(1),
+                rangeX: [-10, 10],
+                rangeY: [-2, 2],
+                label: "sen(x)",
+            },
+            {
+                fun: new CosFunc(1),
+                rangeX: [-10, 10],
+                rangeY: [-2, 2],
+                label: "cos(x)",
+            },
+        ];
+
+        this.opH = 100;
+
+        let op = this.options[0];
+        this.board = new Board(op.fun, 0, 0, w * 0.9, h);
+        this.board.rangeX = op.rangeX;
+        this.board.rangeY = op.rangeX;
+        this.xPos = this.board.rangeX[0];
+    }
+
+    update() {
+        let g = this.graphics;
+        let b = this.board;
+
+        this.xPos += 0.01;
+        b.markedTanLines.push(this.xPos);
+        b.markedPoints.push([this.xPos, b.fun.valAt(this.xPos)]);
+
+        g.background(0);
+        b.display();
+
+        g.image(b.graphics, b.px, b.py);
+
+        let opW = this.w * 0.95;
+        g.textSize(24);
+        g.fill(255);
+        g.noStroke();
+        g.textAlign(CENTER, CENTER);
+        for (let i = 0; i < this.options.length; i++) {
+            let op = this.options[i];
+            g.text(op.label, opW, this.opH * i + this.opH / 2);
+        }
+
+
+        image(g, this.px, this.py);
+
+        b.markedTanLines = [];
+        b.markedPoints = [];
+
+        if (this.xPos > b.rangeX[1]) this.xPos = b.rangeX[0];
+    }
+
+    onMousePressed(button, mx, my) {
+        for (let i = 0; i < this.options.length; i++) {
+            if (mx > this.w * 0.9) {
+                if (my < (i + 1) * this.opH) {
+                    this.selectOption(this.options[i]);
+                    break;
+                }
+            }
+        }
+    }
+
+    selectOption(op) {
+        let ac = new TanLine(this.px, this.py, this.w, this.h);
+        ac.board.fun = op.fun;
+        ac.board.rangeX = op.rangeX;
+        ac.board.rangeY = op.rangeY;
+        ac.xPos = ac.board.rangeX[0];
+        act = ac;
+    }
+}
+
+class DerivativeForming extends Activity {
+    constructor(px, py, w, h) {
+        super(px, py, w, h);
+        //let fun = new SinFunc(0.4);
+        let boardW = w / 2.5;
+        let boardH = h / 1.3;
+
+        this.derMarkedPoints = [];
+
+        this.options = [
+            {
+                fun: new LinFunc(1, 0),
+                rangeX: [-10, 10],
+                rangeY: [-10, 10],
+                label: "x",
+            },
+            {
+                fun: new QuadFunc(1, 0, 0),
+                rangeX: [-3.5, 3.5],
+                rangeY: [-10, 10],
+                label: "x²",
+            },
+            {
+                fun: new PolyFunc([[1, 3]]),
+                rangeX: [-3, 3],
+                rangeY: [-10, 10],
+                label: "x³",
+            },
+            {
+                fun: new SinFunc(1),
+                rangeX: [-7, 7],
+                rangeY: [-2, 2],
+                label: "sen(x)",
+            },
+            {
+                fun: new CosFunc(1),
+                rangeX: [-7, 7],
+                rangeY: [-2, 2],
+                label: "cos(x)",
+            },
+        ];
+
+        this.opH = 100;
+
+        let op = this.options[1];
+        this.board1 = new Board(op.fun, w / 4 - boardW / 2, h / 2 - boardH / 2, boardW, boardH);
+        this.board1.rangeX = op.rangeX;
+        this.board1.rangeY = op.rangeY;
+        this.board1.markedTanLinesWeight = 5;
+        this.board1.markedPointsColor = color(0, 255, 0);
+        this.board1.markedPointsWeight = 10;
+
+        this.board2 = new Board(op.fun.der(), 3 * (w / 4) - boardW / 2 - this.w * 0.05, h / 2 - boardH / 2, boardW, boardH);
+        this.board2.rangeX = op.rangeX;
+        this.board2.rangeY = op.rangeY;
+        this.board2.showFunction = false;
+
+        this.xPos = this.board1.rangeX[0];
+    }
+
+    update() {
+        let g = this.graphics;
+        let b1 = this.board1;
+        let b2 = this.board2;
+
+        this.xPos += 0.005;
+        b1.markedTanLines.push(this.xPos);
+        b1.markedPoints.push([this.xPos, b1.fun.valAt(this.xPos)]);
+
+        g.background(0);
+
+        let derColor = color(map(b1.fun.derAt(this.xPos), -1, 1, 255, 0), map(b1.fun.derAt(this.xPos), -1, 1, 0, 255), map(b1.fun.derAt(this.xPos), -1, 1, 0, 255));
+        b1.markedTanLinesColor = derColor;
+
+        let derX = map(this.xPos, b2.rangeX[0], b2.rangeX[1], b2.px, b2.px + b2.w);
+        let derY = map(b2.fun.valAt(this.xPos), b2.rangeY[1], b2.rangeY[0], b2.py, b2.py + b2.h);
+        this.derMarkedPoints.push([derX, derY, derColor]);
+
+        b1.display();
+        b2.display();
+
+        g.image(b1.graphics, b1.px, b1.py);
+        g.image(b2.graphics, b2.px, b2.py);
+
+        g.strokeWeight(10);
+        for (let i = 0; i < this.derMarkedPoints.length; i++) {
+            g.stroke(this.derMarkedPoints[i][2]);
+            g.point(this.derMarkedPoints[i][0], this.derMarkedPoints[i][1]);
+        }
+
+        let opW = this.w * 0.95;
+        g.textSize(24);
+        g.fill(255);
+        g.noStroke();
+        g.textAlign(CENTER, CENTER);
+        for (let i = 0; i < this.options.length; i++) {
+            let op = this.options[i];
+            g.text(op.label, opW, this.opH * i + this.opH / 2);
+        }
+
+
+        image(g, this.px, this.py);
+
+        b1.markedTanLines = [];
+        b1.markedPoints = [];
+
+        if (this.xPos > b1.rangeX[1]) {
+            this.xPos = b1.rangeX[0];
+            this.derMarkedPoints = [];
+        }
+    }
+
+    onMousePressed(button, mx, my) {
+        for (let i = 0; i < this.options.length; i++) {
+            if (mx > this.w * 0.9) {
+                if (my < (i + 1) * this.opH) {
+                    this.selectOption(this.options[i]);
+                    break;
+                }
+            }
+        }
+    }
+
+    selectOption(op) {
+        let ac = new DerivativeForming(this.px, this.py, this.w, this.h);
+        ac.board1.fun = op.fun;
+        ac.board1.rangeX = op.rangeX;
+        ac.board1.rangeY = op.rangeY;
+        ac.xPos = ac.board1.rangeX[0];
+        ac.board2.fun = op.fun.der();
+        ac.board2.rangeX = op.rangeX;
+        ac.board2.rangeY = op.rangeY;
+        act = ac;
+    }
 }
