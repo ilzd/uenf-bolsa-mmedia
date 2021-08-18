@@ -1,57 +1,95 @@
 const INF = 999999;
+const OPTION_SIZE = 35;
 
 class Activity {
-    constructor(px, py, w, h) {
+
+    constructor(px, py, w, h, hasControls) {
         this.px = px;
         this.py = py;
         this.w = w;
         this.h = h;
+        this.hasControls = hasControls;
         this.graphics = createGraphics(w, h);
+        changeSpeed(2);
     }
 
     //Metodo que atualiza o estado do OA
-    update() { }
+    update() {
+        if(this.hasControls){
+            this.drawControls();
+        }
+     }
 
     //Método que captura os eventos de teclado enviados pelo P5.js
     onKeyPressed(key) { }
 
     //Método que captura os eventos de mouse enviados pelo P5.js
-    onMousePressed(button, mx, my) { }
+    onMousePressed(button, mx, my) {
+        if(this.hasControls){
+            if(my < OPTION_SIZE * 1){
+                if(mx < speedOptions.length * OPTION_SIZE){
+                    changeSpeed((int)(mx / OPTION_SIZE));
+                }
+            }
+        }
+    }
+
+    //Desenha os controles de exibição
+    drawControls(){
+        let g = this.graphics;
+
+        g.textAlign(CENTER, CENTER);
+        g.textSize(12);
+        for(let i = 0; i < speedOptions.length; i++){
+            if(i == speedSelected){
+                g.fill(200, 127);
+            } else {
+                g.fill(63, 127);
+            }
+            g.stroke(255);
+            g.strokeWeight(1);
+            g.rect(i * OPTION_SIZE, 0, OPTION_SIZE, OPTION_SIZE);
+            g.fill(255);
+            g.noStroke();
+            g.text("" + speedOptions[i] + "x", i * OPTION_SIZE + OPTION_SIZE / 2, OPTION_SIZE / 2);
+        }
+        
+    }
 }
 
 class MenuActivity extends Activity {
-    constructor(px, py, w, h) {
-        super(px, py, w, h);
+    constructor(px, py, w, h, hasControls) {
+        super(px, py, w, h, hasControls);
         this.options = [
             {
                 pos: [w / 2, 300],
                 title: "Curvas de funções",
-                act: new SimpleGraphDisplay(px, py, w, h),
+                act: new SimpleGraphDisplay(px, py, w, h, true),
             },
             {
                 pos: [w / 2, 340],
                 title: "Formação da curva de funções",
-                act: new FunctionCurveForming(px, py, w, h),
+                act: new FunctionCurveForming(px, py, w, h, true),
             },
             {
                 pos: [w / 2, 380],
                 title: "Função seno pelo círculo trigonométrico",
-                act: new SinForming(px, py, w, h),
+                act: new SinForming(px, py, w, h, true),
             },
             {
                 pos: [w / 2, 420],
                 title: "Função cosseno pelo círculo trigonométrico",
-                act: new CosForming(px, py, w, h),
+                act: new CosForming(px, py, w, h, true),
             },
             {
                 pos: [w / 2, 460],
                 title: "Reta tangente",
-                act: new TanLine(px, py, w, h),
+                act: new TanLine(px, py, w, h, true),
             },
             {
                 pos: [w / 2, 500],
                 title: "Formação da função derivada",
-                act: new DerivativeForming(px, py, w, h),
+                act: new DerivativeForming(px, py, w, h, true),
             },
         ]
     }
@@ -77,7 +115,8 @@ class MenuActivity extends Activity {
             g.text((i + 1) + ". " + op.title, op.pos[0], op.pos[1]);
         }
 
-        image(g, this.px, this.py);
+        super.update();
+        image(g, this.px, this.py);        
     }
 
     onKeyPressed(key) {
@@ -87,15 +126,17 @@ class MenuActivity extends Activity {
                 break;
             }
         }
+        super.onKeyPressed(key);
     }
 
     onMousePressed(button, mx, my) {
+        super.onMousePressed(button, mx, my);
     }
 }
 
 class SimpleGraphDisplay extends Activity {
-    constructor(px, py, w, h) {
-        super(px, py, w, h);
+    constructor(px, py, w, h, hasControls) {
+        super(px, py, w, h, hasControls);
 
         this.options = [
             {
@@ -157,10 +198,12 @@ class SimpleGraphDisplay extends Activity {
             g.text(op.label, opW, this.opH * i + this.opH / 2);
         }
 
-        image(g, this.px, this.py);
+        super.update();
+        image(g, this.px, this.py);       
     }
 
     onKeyPressed(key) {
+        super.onKeyPressed(key);
     }
 
     onMousePressed(button, mx, my) {
@@ -172,6 +215,7 @@ class SimpleGraphDisplay extends Activity {
                 }
             }
         }
+        super.onMousePressed(button, mx, my);
     }
 
     selectOption(op) {
@@ -182,9 +226,9 @@ class SimpleGraphDisplay extends Activity {
 }
 
 class FunctionCurveForming extends Activity {
-    constructor(px, py, w, h) {
-        super(px, py, w, h);
-        this.fun = new SinFunc(1);
+    constructor(px, py, w, h, hasControls) {
+        super(px, py, w, h, hasControls);
+        this.fun = new LinFunc(1, 0);
 
         this.labelParam = 'x';
         this.labelY = 'y';
@@ -399,7 +443,8 @@ class FunctionCurveForming extends Activity {
             g.text(op.label, opW, this.opH * i + this.opH / 2);
         }
 
-        image(g, this.px, this.py);
+        super.update();
+        image(g, this.px, this.py);       
     }
 
     calculateLabel() {
@@ -411,7 +456,7 @@ class FunctionCurveForming extends Activity {
     }
 
     onKeyPressed(key) {
-
+        super.onKeyPressed(key);
     }
 
     onMousePressed(button, mx, my) {
@@ -423,11 +468,12 @@ class FunctionCurveForming extends Activity {
                 }
             }
         }
+        super.onMousePressed(button, mx, my);
     }
 
 
     selectOption(op) {
-        let ac = new FunctionCurveForming(this.px, this.py, this.w, this.h);
+        let ac = new FunctionCurveForming(this.px, this.py, this.w, this.h, true);
         ac.board.fun = op.fun;
         ac.fun = op.fun;
         ac.board.rangeX = op.rangeX;
@@ -440,8 +486,8 @@ class FunctionCurveForming extends Activity {
 }
 
 class SinForming extends Activity {
-    constructor(px, py, w, h) {
-        super(px, py, w, h);
+    constructor(px, py, w, h, hasControls) {
+        super(px, py, w, h, hasControls);
         this.sinBoardW = w / 2.1;
         this.sinBoardH = h / 2.1;
         this.board = new Board(new SinFunc(1), 3 * (w / 4) - this.sinBoardW / 2, h / 2 - this.sinBoardH / 2, this.sinBoardW, this.sinBoardH);
@@ -517,18 +563,22 @@ class SinForming extends Activity {
             b.markedPoints = [];
         }
 
-
-        image(g, this.px, this.py);
+        super.update();
+        image(g, this.px, this.py);       
     }
 
-    onKeyPressed(key) { }
+    onKeyPressed(key) {
+        super.onKeyPressed(key);
+    }
 
-    onMousePressed(button, mx, my) { }
+    onMousePressed(button, mx, my) {
+        super.onMousePressed(button, mx, my);
+    }
 }
 
 class CosForming extends Activity {
-    constructor(px, py, w, h) {
-        super(px, py, w, h);
+    constructor(px, py, w, h, hasControls) {
+        super(px, py, w, h, hasControls);
         this.sinBoardW = w / 2.1;
         this.sinBoardH = h / 2.1;
         this.board = new Board(new CosFunc(1), 3 * (w / 4) - this.sinBoardW / 2, h / 2 - this.sinBoardH / 2, this.sinBoardW, this.sinBoardH);
@@ -605,17 +655,22 @@ class CosForming extends Activity {
         }
 
 
-        image(g, this.px, this.py);
+        super.update();
+        image(g, this.px, this.py);       
     }
 
-    onKeyPressed(key) { }
+    onKeyPressed(key) {
+        super.onKeyPressed(key);
+    }
 
-    onMousePressed(button, mx, my) { }
+    onMousePressed(button, mx, my) {
+        super.onMousePressed(button, mx, my);
+    }
 }
 
 class TanLine extends Activity {
-    constructor(px, py, w, h) {
-        super(px, py, w, h);
+    constructor(px, py, w, h, hasControls) {
+        super(px, py, w, h, hasControls);
 
         this.options = [
             {
@@ -682,13 +737,17 @@ class TanLine extends Activity {
             g.text(op.label, opW, this.opH * i + this.opH / 2);
         }
 
-
+        super.update();
         image(g, this.px, this.py);
 
         b.markedTanLines = [];
         b.markedPoints = [];
 
         if (this.xPos > b.rangeX[1]) this.xPos = b.rangeX[0];
+    }
+
+    onKeyPressed(key) {
+        super.onKeyPressed(key);
     }
 
     onMousePressed(button, mx, my) {
@@ -700,10 +759,11 @@ class TanLine extends Activity {
                 }
             }
         }
+        super.onMousePressed(button, mx, my);
     }
 
     selectOption(op) {
-        let ac = new TanLine(this.px, this.py, this.w, this.h);
+        let ac = new TanLine(this.px, this.py, this.w, this.h, true);
         ac.board.fun = op.fun;
         ac.board.rangeX = op.rangeX;
         ac.board.rangeY = op.rangeY;
@@ -713,8 +773,8 @@ class TanLine extends Activity {
 }
 
 class DerivativeForming extends Activity {
-    constructor(px, py, w, h) {
-        super(px, py, w, h);
+    constructor(px, py, w, h, hasControls) {
+        super(px, py, w, h, hasControls);
         //let fun = new SinFunc(0.4);
         let boardW = w / 2.5;
         let boardH = h / 1.3;
@@ -813,7 +873,8 @@ class DerivativeForming extends Activity {
         }
 
 
-        image(g, this.px, this.py);
+        super.update();
+        image(g, this.px, this.py);       
 
         b1.markedTanLines = [];
         b1.markedPoints = [];
@@ -822,6 +883,10 @@ class DerivativeForming extends Activity {
             this.xPos = b1.rangeX[0];
             this.derMarkedPoints = [];
         }
+    }
+
+    onKeyPressed(key) {
+        super.onKeyPressed(key);
     }
 
     onMousePressed(button, mx, my) {
@@ -833,10 +898,11 @@ class DerivativeForming extends Activity {
                 }
             }
         }
+        super.onMousePressed(button, mx, my);
     }
 
     selectOption(op) {
-        let ac = new DerivativeForming(this.px, this.py, this.w, this.h);
+        let ac = new DerivativeForming(this.px, this.py, this.w, this.h, true);
         ac.board1.fun = op.fun;
         ac.board1.rangeX = op.rangeX;
         ac.board1.rangeY = op.rangeY;
