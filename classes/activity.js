@@ -11,37 +11,48 @@ class Activity {
         this.hasControls = hasControls;
         this.graphics = createGraphics(w, h);
         changeSpeed(2);
+        paused = false;
+        this.selectedOption = 0;
     }
 
     //Metodo que atualiza o estado do OA
     update() {
-        if(this.hasControls){
+        if (this.hasControls) {
             this.drawControls();
         }
-     }
+    }
 
     //Método que captura os eventos de teclado enviados pelo P5.js
-    onKeyPressed(key) { }
+    onKeyPressed(key) {
+        if (key == 'p' || key == 'P') {
+            paused = !paused;
+        } else
+        if (key == 'r' || key == 'R') {
+            this.restart();
+        } 
+    }
 
     //Método que captura os eventos de mouse enviados pelo P5.js
     onMousePressed(button, mx, my) {
-        if(this.hasControls){
-            if(my < OPTION_SIZE * 1){
-                if(mx < speedOptions.length * OPTION_SIZE){
+        if (this.hasControls) {
+            if (my < OPTION_SIZE * 1) {
+                if (mx < speedOptions.length * OPTION_SIZE) {
                     changeSpeed((int)(mx / OPTION_SIZE));
                 }
             }
         }
     }
 
+    restart(){}
+
     //Desenha os controles de exibição
-    drawControls(){
+    drawControls() {
         let g = this.graphics;
 
         g.textAlign(CENTER, CENTER);
-        g.textSize(12);
-        for(let i = 0; i < speedOptions.length; i++){
-            if(i == speedSelected){
+        g.textSize(14);
+        for (let i = 0; i < speedOptions.length; i++) {
+            if (i == speedSelected) {
                 g.fill(200, 127);
             } else {
                 g.fill(63, 127);
@@ -53,7 +64,11 @@ class Activity {
             g.noStroke();
             g.text("" + speedOptions[i] + "x", i * OPTION_SIZE + OPTION_SIZE / 2, OPTION_SIZE / 2);
         }
-        
+
+        g.textAlign(LEFT, TOP);
+        g.text("Pausar/Retomar(P)", 5, 10 + OPTION_SIZE);
+        g.text("Reiniciar(R)", 5, 30 + OPTION_SIZE);
+
     }
 }
 
@@ -116,7 +131,7 @@ class MenuActivity extends Activity {
         }
 
         super.update();
-        image(g, this.px, this.py);        
+        image(g, this.px, this.py);
     }
 
     onKeyPressed(key) {
@@ -180,6 +195,11 @@ class SimpleGraphDisplay extends Activity {
         this.board.showRanges = false;
     }
 
+    restart(){
+        let ac = new SimpleGraphDisplay(this.px, this.py, this.w, this.h, true);
+        ac.selectOption(ac.options[this.selectedOption], this.selectedOption);
+    }
+
     update() {
         let g = this.graphics;
         let b = this.board;
@@ -199,7 +219,7 @@ class SimpleGraphDisplay extends Activity {
         }
 
         super.update();
-        image(g, this.px, this.py);       
+        image(g, this.px, this.py);
     }
 
     onKeyPressed(key) {
@@ -210,7 +230,7 @@ class SimpleGraphDisplay extends Activity {
         for (let i = 0; i < this.options.length; i++) {
             if (mx > this.w * 0.9) {
                 if (my < (i + 1) * this.opH) {
-                    this.selectOption(this.options[i]);
+                    this.selectOption(this.options[i], i);
                     break;
                 }
             }
@@ -218,7 +238,8 @@ class SimpleGraphDisplay extends Activity {
         super.onMousePressed(button, mx, my);
     }
 
-    selectOption(op) {
+    selectOption(op, i) {
+        this.selectedOption = i;
         this.board.fun = op.fun;
         this.board.rangeX = op.rangeX;
         this.board.rangeY = op.rangeY;
@@ -302,6 +323,11 @@ class FunctionCurveForming extends Activity {
         this.board.showFunction = false;
     }
 
+    restart(){
+        let ac = new FunctionCurveForming(this.px, this.py, this.w, this.h, true);
+        ac.selectOption(ac.options[this.selectedOption], this.selectedOption);
+    }
+
     update() {
         let g = this.graphics;
         let b = this.board;
@@ -315,6 +341,7 @@ class FunctionCurveForming extends Activity {
         g.textSize(this.labelTextSize);
         g.textAlign(CENTER, CENTER);
         g.text(this.funcLabelText, this.labelPos[0], this.labelPos[1]);
+
 
         let posX, posY;
         if (this.waitTimer > 0) {
@@ -443,8 +470,10 @@ class FunctionCurveForming extends Activity {
             g.text(op.label, opW, this.opH * i + this.opH / 2);
         }
 
+
+
         super.update();
-        image(g, this.px, this.py);       
+        image(g, this.px, this.py);
     }
 
     calculateLabel() {
@@ -463,7 +492,7 @@ class FunctionCurveForming extends Activity {
         for (let i = 0; i < this.options.length; i++) {
             if (mx > this.w * 0.9) {
                 if (my < (i + 1) * this.opH) {
-                    this.selectOption(this.options[i]);
+                    this.selectOption(this.options[i], i);
                     break;
                 }
             }
@@ -472,8 +501,9 @@ class FunctionCurveForming extends Activity {
     }
 
 
-    selectOption(op) {
+    selectOption(op, i) {
         let ac = new FunctionCurveForming(this.px, this.py, this.w, this.h, true);
+        ac.selectedOption = i;
         ac.board.fun = op.fun;
         ac.fun = op.fun;
         ac.board.rangeX = op.rangeX;
@@ -497,6 +527,10 @@ class SinForming extends Activity {
         this.xPos = this.board.rangeX[0];
         this.circlePx = w / 4;
         this.circlePy = h / 2;
+    }
+
+    restart(){
+        act = new SinForming(this.px, this.py, this.w, this.h, true);
     }
 
     update() {
@@ -564,7 +598,7 @@ class SinForming extends Activity {
         }
 
         super.update();
-        image(g, this.px, this.py);       
+        image(g, this.px, this.py);
     }
 
     onKeyPressed(key) {
@@ -588,6 +622,10 @@ class CosForming extends Activity {
         this.xPos = this.board.rangeX[0];
         this.circlePx = w / 4;
         this.circlePy = h / 2;
+    }
+
+    restart(){
+        act = new CosForming(this.px, this.py, this.w, this.h, true);
     }
 
     update() {
@@ -656,7 +694,7 @@ class CosForming extends Activity {
 
 
         super.update();
-        image(g, this.px, this.py);       
+        image(g, this.px, this.py);
     }
 
     onKeyPressed(key) {
@@ -714,6 +752,11 @@ class TanLine extends Activity {
         this.xPos = this.board.rangeX[0];
     }
 
+    restart(){
+        let ac = new TanLine(this.px, this.py, this.w, this.h, true);
+        ac.selectOption(ac.options[this.selectedOption], this.selectedOption);
+    }
+
     update() {
         let g = this.graphics;
         let b = this.board;
@@ -754,7 +797,7 @@ class TanLine extends Activity {
         for (let i = 0; i < this.options.length; i++) {
             if (mx > this.w * 0.9) {
                 if (my < (i + 1) * this.opH) {
-                    this.selectOption(this.options[i]);
+                    this.selectOption(this.options[i], i);
                     break;
                 }
             }
@@ -762,8 +805,9 @@ class TanLine extends Activity {
         super.onMousePressed(button, mx, my);
     }
 
-    selectOption(op) {
+    selectOption(op, i) {
         let ac = new TanLine(this.px, this.py, this.w, this.h, true);
+        ac.selectedOption = i;
         ac.board.fun = op.fun;
         ac.board.rangeX = op.rangeX;
         ac.board.rangeY = op.rangeY;
@@ -832,6 +876,11 @@ class DerivativeForming extends Activity {
         this.xPos = this.board1.rangeX[0];
     }
 
+    restart(){
+        let ac = new DerivativeForming(this.px, this.py, this.w, this.h, true);
+        ac.selectOption(ac.options[this.selectedOption], this.selectedOption);
+    }
+
     update() {
         let g = this.graphics;
         let b1 = this.board1;
@@ -874,7 +923,7 @@ class DerivativeForming extends Activity {
 
 
         super.update();
-        image(g, this.px, this.py);       
+        image(g, this.px, this.py);
 
         b1.markedTanLines = [];
         b1.markedPoints = [];
@@ -893,7 +942,7 @@ class DerivativeForming extends Activity {
         for (let i = 0; i < this.options.length; i++) {
             if (mx > this.w * 0.9) {
                 if (my < (i + 1) * this.opH) {
-                    this.selectOption(this.options[i]);
+                    this.selectOption(this.options[i], i);
                     break;
                 }
             }
@@ -901,8 +950,9 @@ class DerivativeForming extends Activity {
         super.onMousePressed(button, mx, my);
     }
 
-    selectOption(op) {
+    selectOption(op, i) {
         let ac = new DerivativeForming(this.px, this.py, this.w, this.h, true);
+        ac.selectedOption = i;
         ac.board1.fun = op.fun;
         ac.board1.rangeX = op.rangeX;
         ac.board1.rangeY = op.rangeY;
