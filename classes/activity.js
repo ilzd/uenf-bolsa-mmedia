@@ -27,9 +27,9 @@ class Activity {
         if (key == 'p' || key == 'P') {
             paused = !paused;
         } else
-        if (key == 'r' || key == 'R') {
-            this.restart();
-        } 
+            if (key == 'r' || key == 'R') {
+                this.restart();
+            }
     }
 
     //Método que captura os eventos de mouse enviados pelo P5.js
@@ -43,7 +43,7 @@ class Activity {
         }
     }
 
-    restart(){}
+    restart() { }
 
     //Desenha os controles de exibição
     drawControls() {
@@ -73,6 +73,63 @@ class Activity {
 }
 
 class MenuActivity extends Activity {
+    constructor(px, py, w, h, hasControls) {
+        super(px, py, w, h, hasControls);
+        this.options = [
+            {
+                pos: [w / 2, 300],
+                title: "Cálculo",
+                act: new CalcMenuActivity(px, py, w, h, false),
+            },
+            {
+                pos: [w / 2, 340],
+                title: "Geometria Analítica",
+                act: new GeomMenuActivity(px, py, w, h, false),
+            }
+        ]
+    }
+
+    update() {
+        let g = this.graphics;
+
+        g.background(0);
+
+        g.fill(255);
+        g.noStroke();
+        g.textAlign(CENTER, CENTER);
+        g.textSize(38);
+
+        g.text("Objetos de aprendizagem", this.w / 2, 100);
+
+        g.textSize(28);
+        g.text("Pressione o número da opção desejada:", this.w / 2, 250);
+
+        g.textSize(24);
+        for (let i = 0; i < this.options.length; i++) {
+            let op = this.options[i];
+            g.text((i + 1) + ". " + op.title, op.pos[0], op.pos[1]);
+        }
+
+        super.update();
+        image(g, this.px, this.py);
+    }
+
+    onKeyPressed(key) {
+        for (let i = 0; i < this.options.length; i++) {
+            if (key == "" + (i + 1)) {
+                act = this.options[i].act;
+                break;
+            }
+        }
+        super.onKeyPressed(key);
+    }
+
+    onMousePressed(button, mx, my) {
+        super.onMousePressed(button, mx, my);
+    }
+}
+
+class CalcMenuActivity extends Activity {
     constructor(px, py, w, h, hasControls) {
         super(px, py, w, h, hasControls);
         this.options = [
@@ -149,6 +206,74 @@ class MenuActivity extends Activity {
     }
 }
 
+class GeomMenuActivity extends Activity {
+    constructor(px, py, w, h, hasControls) {
+        super(px, py, w, h, hasControls);
+        this.options = [
+            {
+                pos: [w / 2, 300],
+                title: "Visualização de Cônicas",
+                act: new SimpleShowConics(px, py, w, h, true),
+            },
+            {
+                pos: [w / 2, 340],
+                title: "Coeficientes da Circunferência",
+                act: new CircleCoef(px, py, w, h, true),
+            },
+            {
+                pos: [w / 2, 380],
+                title: "Coeficientes da Ellipse",
+                act: new EllipseCoef(px, py, w, h, true),
+            },
+            {
+                pos: [w / 2, 420],
+                title: "Coeficientes da Parabola",
+                act: new ParabolaCoef(px, py, w, h, true),
+            },
+        ]
+    }
+
+    update() {
+        let g = this.graphics;
+
+        g.background(0);
+
+        g.fill(255);
+        g.noStroke();
+        g.textAlign(CENTER, CENTER);
+        g.textSize(38);
+
+        g.text("Objetos de aprendizagem\nCálculo diferencial e integral", this.w / 2, 100);
+
+        g.textSize(28);
+        g.text("Pressione o número da opção desejada:", this.w / 2, 250);
+
+        g.textSize(24);
+        for (let i = 0; i < this.options.length; i++) {
+            let op = this.options[i];
+            g.text((i + 1) + ". " + op.title, op.pos[0], op.pos[1]);
+        }
+
+        super.update();
+        image(g, this.px, this.py);
+    }
+
+    onKeyPressed(key) {
+        for (let i = 0; i < this.options.length; i++) {
+            if (key == "" + (i + 1)) {
+                act = this.options[i].act;
+                break;
+            }
+        }
+        super.onKeyPressed(key);
+    }
+
+    onMousePressed(button, mx, my) {
+        super.onMousePressed(button, mx, my);
+    }
+}
+
+
 class SimpleGraphDisplay extends Activity {
     constructor(px, py, w, h, hasControls) {
         super(px, py, w, h, hasControls);
@@ -195,7 +320,7 @@ class SimpleGraphDisplay extends Activity {
         this.board.showRanges = false;
     }
 
-    restart(){
+    restart() {
         let ac = new SimpleGraphDisplay(this.px, this.py, this.w, this.h, true);
         ac.selectOption(ac.options[this.selectedOption], this.selectedOption);
     }
@@ -323,7 +448,7 @@ class FunctionCurveForming extends Activity {
         this.board.showFunction = false;
     }
 
-    restart(){
+    restart() {
         let ac = new FunctionCurveForming(this.px, this.py, this.w, this.h, true);
         ac.selectOption(ac.options[this.selectedOption], this.selectedOption);
     }
@@ -529,7 +654,7 @@ class SinForming extends Activity {
         this.circlePy = h / 2;
     }
 
-    restart(){
+    restart() {
         act = new SinForming(this.px, this.py, this.w, this.h, true);
     }
 
@@ -624,7 +749,7 @@ class CosForming extends Activity {
         this.circlePy = h / 2;
     }
 
-    restart(){
+    restart() {
         act = new CosForming(this.px, this.py, this.w, this.h, true);
     }
 
@@ -752,7 +877,7 @@ class TanLine extends Activity {
         this.xPos = this.board.rangeX[0];
     }
 
-    restart(){
+    restart() {
         let ac = new TanLine(this.px, this.py, this.w, this.h, true);
         ac.selectOption(ac.options[this.selectedOption], this.selectedOption);
     }
@@ -876,7 +1001,7 @@ class DerivativeForming extends Activity {
         this.xPos = this.board1.rangeX[0];
     }
 
-    restart(){
+    restart() {
         let ac = new DerivativeForming(this.px, this.py, this.w, this.h, true);
         ac.selectOption(ac.options[this.selectedOption], this.selectedOption);
     }
@@ -961,5 +1086,283 @@ class DerivativeForming extends Activity {
         ac.board2.rangeX = op.rangeX;
         ac.board2.rangeY = op.rangeY;
         act = ac;
+    }
+}
+
+class SimpleShowConics extends Activity {
+    constructor(px, py, w, h, hasControls) {
+        super(px, py, w, h, hasControls);
+        this.px = px;
+        this.py = py;
+        this.w = w;
+        this.h = h;
+        this.hasControls = hasControls;
+        this.graphics = createGraphics(w, h);
+        changeSpeed(2);
+        paused = false;
+        this.selectedOption = 0;
+        this.board = new BoardC(new Ellipse(30, 20), px + w / 2 - h / 2, py + h / 2 - h / 2, h, h);
+
+        this.options = [
+            {
+                conic: new Circle(25),
+                rangeX: [-50, 50],
+                rangeY: [-50, 50],
+                label: "Circ.",
+            },
+            {
+                conic: new Ellipse(30, 20),
+                rangeX: [-50, 50],
+                rangeY: [-50, 50],
+                label: "Ellip.",
+            },
+            {
+                conic: new Parabola(5),
+                rangeX: [-50, 50],
+                rangeY: [-50, 50],
+                label: "Parab.",
+            },
+            {
+                conic: new Hiperbole(1, 1),
+                rangeX: [-50, 50],
+                rangeY: [-50, 50],
+                label: "Hiperb.",
+            },
+        ];
+
+        this.opH = 100;
+    }
+
+    restart() {
+        let ac = new SimpleShowConics(this.px, this.py, this.w, this.h, true);
+    }
+
+    update() {
+        let g = this.graphics;
+        let b = this.board;
+
+        g.background(0);
+
+        b.display();
+        g.image(b.graphics, b.px, b.py);
+
+        let opW = this.w * 0.95;
+        g.textSize(24);
+        g.fill(255);
+        g.noStroke();
+        g.textAlign(CENTER, CENTER);
+        for (let i = 0; i < this.options.length; i++) {
+            let op = this.options[i];
+            g.text(op.label, opW, this.opH * i + this.opH / 2);
+        }
+
+        super.update();
+        image(g, this.px, this.py);
+    }
+
+    onKeyPressed(key) {
+        super.onKeyPressed(key);
+    }
+
+    onMousePressed(button, mx, my) {
+        for (let i = 0; i < this.options.length; i++) {
+            if (mx > this.w * 0.9) {
+                if (my < (i + 1) * this.opH) {
+                    this.selectOption(this.options[i], i);
+                    break;
+                }
+            }
+        }
+        super.onMousePressed(button, mx, my);
+    }
+
+    selectOption(op, i) {
+        let ac = new SimpleShowConics(this.px, this.py, this.w, this.h, true);
+        ac.selectedOption = i;
+        ac.board.conic = op.conic;
+        ac.board.rangeX = op.rangeX;
+        ac.board.rangeY = op.rangeY;
+        act = ac;
+    }
+}
+
+class CircleCoef extends Activity {
+    constructor(px, py, w, h, hasControls) {
+        super(px, py, w, h, hasControls);
+        this.px = px;
+        this.py = py;
+        this.w = w;
+        this.h = h;
+        this.hasControls = hasControls;
+        this.graphics = createGraphics(w, h);
+        changeSpeed(2);
+        paused = false;
+        this.selectedOption = 0;
+        this.board = new BoardC(new Circle(30), px + w / 2 - h / 2, py + h / 2 - h / 2, h, h);
+        this.transitions = [
+            {stepR: 0.05, count: 250},
+            {stepR: -0.05, count: 500},
+            {stepR: 0.05, count: 250},
+        ];
+        this.transI = 0;
+        this.transCount = 0;
+    }
+
+    restart() {
+        let ac = new CircleCoef(this.px, this.py, this.w, this.h, true);
+    }
+
+    update() {
+        let g = this.graphics;
+        let b = this.board;
+
+        g.background(0);
+
+        b.display();
+        g.image(b.graphics, b.px, b.py);
+
+        let transition = this.transitions[this.transI];
+        this.board.conic.r += transition.stepR;
+        this.transCount++;
+        if(this.transCount == transition.count){
+            this.transCount = 0;
+            this.transI++;
+            if(this.transI == this.transitions.length) {
+                this.transI = 0;
+            }
+        }
+
+        super.update();
+        image(g, this.px, this.py);
+    }
+
+    onKeyPressed(key) {
+        super.onKeyPressed(key);
+    }
+
+    onMousePressed(button, mx, my) {
+        super.onMousePressed(button, mx, my);
+    }
+}
+
+class EllipseCoef extends Activity {
+    constructor(px, py, w, h, hasControls) {
+        super(px, py, w, h, hasControls);
+        this.px = px;
+        this.py = py;
+        this.w = w;
+        this.h = h;
+        this.hasControls = hasControls;
+        this.graphics = createGraphics(w, h);
+        changeSpeed(2);
+        paused = false;
+        this.selectedOption = 0;
+        this.board = new BoardC(new Ellipse(30, 20), px + w / 2 - h / 2, py + h / 2 - h / 2, h, h);
+        this.transitions = [
+            {stepA: 0.05, stepB: 0, count: 250},
+            {stepA: -0.05, stepB: 0, count: 500},
+            {stepA: 0.05, stepB: 0, count: 250},
+            {stepA: 0, stepB: 0.05, count: 250},
+            {stepA: 0, stepB: -0.05, count: 500},
+            {stepA: 0, stepB: 0.05, count: 250},
+        ];
+        this.transI = 0;
+        this.transCount = 0;
+    }
+
+    restart() {
+        let ac = new EllipseCoef(this.px, this.py, this.w, this.h, true);
+    }
+
+    update() {
+        let g = this.graphics;
+        let b = this.board;
+
+        g.background(0);
+
+        b.display();
+        g.image(b.graphics, b.px, b.py);
+
+        let transition = this.transitions[this.transI];
+        this.board.conic.a += transition.stepA;
+        this.board.conic.b += transition.stepB;
+        this.transCount++;
+        if(this.transCount == transition.count){
+            this.transCount = 0;
+            this.transI++;
+            if(this.transI == this.transitions.length) {
+                this.transI = 0;
+            }
+        }
+
+        super.update();
+        image(g, this.px, this.py);
+    }
+
+    onKeyPressed(key) {
+        super.onKeyPressed(key);
+    }
+
+    onMousePressed(button, mx, my) {
+        super.onMousePressed(button, mx, my);
+    }
+}
+
+class ParabolaCoef extends Activity {
+    constructor(px, py, w, h, hasControls) {
+        super(px, py, w, h, hasControls);
+        this.px = px;
+        this.py = py;
+        this.w = w;
+        this.h = h;
+        this.hasControls = hasControls;
+        this.graphics = createGraphics(w, h);
+        changeSpeed(2);
+        paused = false;
+        this.selectedOption = 0;
+        this.board = new BoardC(new Parabola(5), px + w / 2 - h / 2, py + h / 2 - h / 2, h, h);
+        this.transitions = [
+            {stepP: 0.05, count: 250},
+            {stepP: -0.05, count: 500},
+            {stepP: 0.05, count: 250},
+        ];
+        this.transI = 0;
+        this.transCount = 0;
+    }
+
+    restart() {
+        let ac = new CircleCoef(this.px, this.py, this.w, this.h, true);
+    }
+
+    update() {
+        let g = this.graphics;
+        let b = this.board;
+
+        g.background(0);
+
+        b.display();
+        g.image(b.graphics, b.px, b.py);
+
+        let transition = this.transitions[this.transI];
+        this.board.conic.p += transition.stepP;
+        this.transCount++;
+        if(this.transCount == transition.count){
+            this.transCount = 0;
+            this.transI++;
+            if(this.transI == this.transitions.length) {
+                this.transI = 0;
+            }
+        }
+
+        super.update();
+        image(g, this.px, this.py);
+    }
+
+    onKeyPressed(key) {
+        super.onKeyPressed(key);
+    }
+
+    onMousePressed(button, mx, my) {
+        super.onMousePressed(button, mx, my);
     }
 }

@@ -61,9 +61,9 @@ class Board {
         gr.stroke(255);
         gr.strokeWeight(.5);
         gr.rect(1, 1, this.w - 2, this.h - 2);
-    } 
+    }
 
-    drawFunctionLabel(){
+    drawFunctionLabel() {
         let gr = this.graphics;
         gr.textAlign(CENTER, TOP);
         gr.fill(255, 127);
@@ -222,4 +222,92 @@ class Board {
 
         gr.pop();
     }
+}
+
+class BoardC {
+    constructor(conic, px, py, w, h) {
+        this.conic = conic;
+        this.px = px;
+        this.py = py;
+        this.w = w;
+        this.h = h;
+        this.graphics = createGraphics(w, h);
+        this.showAxis = true;
+        this.showRanges = true;
+        this.showConicLabel = true;
+        this.rangeX = [-50, 50];
+        this.rangeY = [-50, 50];
+        this.bgColor = color(0, 10, 0);
+    }
+
+    display() {
+        let gr = this.graphics;
+        gr.background(0);
+
+        gr.fill(this.bgColor);
+        gr.noStroke();
+        gr.rect(1, 1, this.w - 2, this.h - 2);
+
+        //Desenha os eixos somente se o estado do quadro indica que sim
+        if (this.showAxis) this.drawAxis(gr);
+
+        //Desenha os limites do plano somente se o estado do quadro indica que sim
+        if (this.showRanges) this.drawRanges(gr);
+
+        //Desenha o "label" da função somente se o estado do quadro indica que sim
+        if (this.showConicLabel) this.drawConicLabel(gr);
+
+        this.drawConic();
+
+        gr.noFill();
+        gr.stroke(255);
+        gr.strokeWeight(.5);
+        gr.rect(1, 1, this.w - 2, this.h - 2);
+    }
+
+    drawConic() {
+        let gr = this.graphics;
+        gr.push();
+        gr.translate(this.w / 2, this.h / 2);
+        gr.scale(this.w / (this.rangeX[1] - this.rangeX[0]), this.h / (this.rangeY[1] - this.rangeY[0]));
+        this.conic.draw(this);
+        gr.pop();
+    }
+
+    drawConicLabel() {
+        let gr = this.graphics;
+        gr.textAlign(CENTER, TOP);
+        gr.fill(255, 127);
+        gr.textSize(24);
+        gr.text(this.conic.label(), 3 * (this.w / 4), 10);
+    }
+
+    drawAxis() {
+        let gr = this.graphics;
+        gr.stroke(255);
+        gr.strokeWeight(1);
+
+        gr.line(0, this.h / 2, this.w, this.h / 2);
+        gr.line(this.w / 2, 0, this.w / 2, this.h);
+    }
+
+    drawRanges() {
+        let gr = this.graphics;
+        gr.noStroke();
+        gr.fill(255);
+        gr.textSize(14);
+
+        gr.textAlign(LEFT, CENTER);
+        gr.text("" + Math.round(this.rangeX[0]), 3, this.h / 2 + 10);
+
+        gr.textAlign(RIGHT, CENTER);
+        gr.text("" + Math.round(this.rangeX[1]), this.w - 3, this.h / 2 + 10);
+
+        gr.textAlign(CENTER, TOP);
+        gr.text("" + Math.round(this.rangeY[1]), this.w / 2 + 10, 3);
+
+        gr.textAlign(CENTER, BOTTOM);
+        gr.text("" + Math.round(this.rangeY[0]), this.w / 2 + 10, this.h - 3);
+    }
+
 }
