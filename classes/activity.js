@@ -230,6 +230,21 @@ class GeomMenuActivity extends Activity {
                 title: "Coeficientes da Parabola",
                 act: new ParabolaCoef(px, py, w, h, true),
             },
+            {
+                pos: [w / 2, 460],
+                title: "Visualização de vetores",
+                act: new SimpleShowVector(px, py, w, h, true),
+            },
+            {
+                pos: [w / 2, 500],
+                title: "Adição de vetores",
+                act: new AddVector(px, py, w, h, true),
+            },
+            {
+                pos: [w / 2, 540],
+                title: "Subtração de vetores",
+                act: new SubVector(px, py, w, h, true),
+            },
         ]
     }
 
@@ -1200,9 +1215,9 @@ class CircleCoef extends Activity {
         this.selectedOption = 0;
         this.board = new BoardC(new Circle(30), px + w / 2 - h / 2, py + h / 2 - h / 2, h, h);
         this.transitions = [
-            {stepR: 0.05, count: 250},
-            {stepR: -0.05, count: 500},
-            {stepR: 0.05, count: 250},
+            { stepR: 0.05, count: 250 },
+            { stepR: -0.05, count: 500 },
+            { stepR: 0.05, count: 250 },
         ];
         this.transI = 0;
         this.transCount = 0;
@@ -1224,10 +1239,10 @@ class CircleCoef extends Activity {
         let transition = this.transitions[this.transI];
         this.board.conic.r += transition.stepR;
         this.transCount++;
-        if(this.transCount == transition.count){
+        if (this.transCount == transition.count) {
             this.transCount = 0;
             this.transI++;
-            if(this.transI == this.transitions.length) {
+            if (this.transI == this.transitions.length) {
                 this.transI = 0;
             }
         }
@@ -1259,12 +1274,12 @@ class EllipseCoef extends Activity {
         this.selectedOption = 0;
         this.board = new BoardC(new Ellipse(30, 20), px + w / 2 - h / 2, py + h / 2 - h / 2, h, h);
         this.transitions = [
-            {stepA: 0.05, stepB: 0, count: 250},
-            {stepA: -0.05, stepB: 0, count: 500},
-            {stepA: 0.05, stepB: 0, count: 250},
-            {stepA: 0, stepB: 0.05, count: 250},
-            {stepA: 0, stepB: -0.05, count: 500},
-            {stepA: 0, stepB: 0.05, count: 250},
+            { stepA: 0.05, stepB: 0, count: 250 },
+            { stepA: -0.05, stepB: 0, count: 500 },
+            { stepA: 0.05, stepB: 0, count: 250 },
+            { stepA: 0, stepB: 0.05, count: 250 },
+            { stepA: 0, stepB: -0.05, count: 500 },
+            { stepA: 0, stepB: 0.05, count: 250 },
         ];
         this.transI = 0;
         this.transCount = 0;
@@ -1287,10 +1302,10 @@ class EllipseCoef extends Activity {
         this.board.conic.a += transition.stepA;
         this.board.conic.b += transition.stepB;
         this.transCount++;
-        if(this.transCount == transition.count){
+        if (this.transCount == transition.count) {
             this.transCount = 0;
             this.transI++;
-            if(this.transI == this.transitions.length) {
+            if (this.transI == this.transitions.length) {
                 this.transI = 0;
             }
         }
@@ -1322,9 +1337,9 @@ class ParabolaCoef extends Activity {
         this.selectedOption = 0;
         this.board = new BoardC(new Parabola(5), px + w / 2 - h / 2, py + h / 2 - h / 2, h, h);
         this.transitions = [
-            {stepP: 0.05, count: 250},
-            {stepP: -0.05, count: 500},
-            {stepP: 0.05, count: 250},
+            { stepP: 0.05, count: 250 },
+            { stepP: -0.05, count: 500 },
+            { stepP: 0.05, count: 250 },
         ];
         this.transI = 0;
         this.transCount = 0;
@@ -1346,13 +1361,177 @@ class ParabolaCoef extends Activity {
         let transition = this.transitions[this.transI];
         this.board.conic.p += transition.stepP;
         this.transCount++;
-        if(this.transCount == transition.count){
+        if (this.transCount == transition.count) {
             this.transCount = 0;
             this.transI++;
-            if(this.transI == this.transitions.length) {
+            if (this.transI == this.transitions.length) {
                 this.transI = 0;
             }
         }
+
+        super.update();
+        image(g, this.px, this.py);
+    }
+
+    onKeyPressed(key) {
+        super.onKeyPressed(key);
+    }
+
+    onMousePressed(button, mx, my) {
+        super.onMousePressed(button, mx, my);
+    }
+}
+
+class SimpleShowVector extends Activity {
+    constructor(px, py, w, h, hasControls) {
+        super(px, py, w, h, hasControls);
+        this.px = px;
+        this.py = py;
+        this.w = w;
+        this.h = h;
+        this.hasControls = hasControls;
+        this.graphics = createGraphics(w, h);
+        changeSpeed(2);
+        paused = false;
+        this.selectedOption = 0;
+        this.board = new BoardV([new Vector(30, 20, 'U')], px + w / 2 - h / 2, py + h / 2 - h / 2, h, h);
+        this.board.sliders = [
+            { vec: this.board.vec[0], xRange: 40, yRange: 40 }
+        ]
+
+        this.opH = 100;
+    }
+
+    restart() {
+        let ac = new SimpleShowVector(this.px, this.py, this.w, this.h, true);
+    }
+
+    update() {
+        let g = this.graphics;
+        let b = this.board;
+
+        g.background(0);
+
+        b.display();
+        g.image(b.graphics, b.px, b.py);
+
+        let opW = this.w * 0.95;
+        g.textSize(24);
+        g.fill(255);
+        g.noStroke();
+        g.textAlign(CENTER, CENTER);
+
+        super.update();
+        image(g, this.px, this.py);
+    }
+
+    onKeyPressed(key) {
+        super.onKeyPressed(key);
+    }
+
+    onMousePressed(button, mx, my) {
+        super.onMousePressed(button, mx, my);
+    }
+}
+
+class AddVector extends Activity {
+    constructor(px, py, w, h, hasControls) {
+        super(px, py, w, h, hasControls);
+        this.px = px;
+        this.py = py;
+        this.w = w;
+        this.h = h;
+        this.hasControls = hasControls;
+        this.graphics = createGraphics(w, h);
+        changeSpeed(2);
+        paused = false;
+        this.selectedOption = 0;
+        this.board = new BoardV([new Vector(5, -10, 'U'), new Vector(10, 20, 'V'), new Vector(0, 0, 'U + V')], px + w / 2 - h / 2, py + h / 2 - h / 2, h, h);
+        this.board.vec[2].color = color(0, 255, 0);
+        this.board.sliders = [
+            { vec: this.board.vec[0], xRange: 20, yRange: 20 },
+            { vec: this.board.vec[1], xRange: 20, yRange: 20 }
+        ]
+
+        this.opH = 100;
+    }
+
+    restart() {
+        let ac = new SimpleShowVector(this.px, this.py, this.w, this.h, true);
+    }
+
+    update() {
+        let g = this.graphics;
+        let b = this.board;
+
+        g.background(0);
+        this.board.vec[2].vec.x = this.board.vec[0].vec.x + this.board.vec[1].vec.x;
+        this.board.vec[2].vec.y = this.board.vec[0].vec.y + this.board.vec[1].vec.y;
+
+        b.display();
+        g.image(b.graphics, b.px, b.py);
+
+        let opW = this.w * 0.95;
+        g.textSize(24);
+        g.fill(255);
+        g.noStroke();
+        g.textAlign(CENTER, CENTER);
+
+        super.update();
+        image(g, this.px, this.py);
+    }
+
+    onKeyPressed(key) {
+        super.onKeyPressed(key);
+    }
+
+    onMousePressed(button, mx, my) {
+        super.onMousePressed(button, mx, my);
+    }
+}
+
+class SubVector extends Activity {
+    constructor(px, py, w, h, hasControls) {
+        super(px, py, w, h, hasControls);
+        this.px = px;
+        this.py = py;
+        this.w = w;
+        this.h = h;
+        this.hasControls = hasControls;
+        this.graphics = createGraphics(w, h);
+        changeSpeed(2);
+        paused = false;
+        this.selectedOption = 0;
+        this.board = new BoardV([new Vector(5, -10, 'U'), new Vector(10, 20, 'V'), new Vector(0, 0, 'U - V')], px + w / 2 - h / 2, py + h / 2 - h / 2, h, h);
+        this.board.vec[2].color = color(0, 255, 0);
+        this.board.sliders = [
+            { vec: this.board.vec[0], xRange: 20, yRange: 20 },
+            { vec: this.board.vec[1], xRange: 20, yRange: 20 }
+        ]
+
+        this.opH = 100;
+    }
+
+    restart() {
+        let ac = new SimpleShowVector(this.px, this.py, this.w, this.h, true);
+    }
+
+    update() {
+        let g = this.graphics;
+        let b = this.board;
+
+        g.background(0);
+        this.board.vec[2].vec.x = this.board.vec[0].vec.x - this.board.vec[1].vec.x;
+        this.board.vec[2].vec.y = this.board.vec[0].vec.y - this.board.vec[1].vec.y;
+
+        b.display();
+        g.image(b.graphics, b.px, b.py);
+
+        let opW = this.w * 0.95;
+        g.textSize(24);
+        g.fill(255);
+        g.noStroke();
+        g.textAlign(CENTER, CENTER);
 
         super.update();
         image(g, this.px, this.py);
